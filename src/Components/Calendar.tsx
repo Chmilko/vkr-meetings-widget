@@ -7,6 +7,8 @@ import ruLocale from "@fullcalendar/core/locales/ru";
 import Modal from "@mui/material/Modal";
 import Room from "./Room";
 
+const SCHEDULE_EVENT = "Запланировать событие"
+
 export default function Calendar() {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -23,7 +25,7 @@ export default function Calendar() {
   // };
 
   const CustomButton: CustomButtonInput = {
-    text: "Запланировать событие",
+    text: SCHEDULE_EVENT,
     click: handleOpen,
   };
 

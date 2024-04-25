@@ -7,7 +7,7 @@ import {
 } from "@matrix-widget-toolkit/mui";
 import { WidgetApiImpl } from "@matrix-widget-toolkit/api";
 import { MatrixCapabilities } from "matrix-widget-api";
-import Calendar from "./Components/Calendar.tsx";
+import Calendar from "./components/Calendar.tsx";
 
 const widgetApiPromise =
   typeof window !== "undefined"

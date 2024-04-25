@@ -26,6 +26,17 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 
+const USERS = "Пользователи"
+const CONFERENCE_NAME = "Имя конференции"
+const DESCRIPTION = "Описание (Опционально)"
+const START_DATE = "Дата начала"
+const END_DATE = "Дата окончания"
+const START_TIME = "Время начала"
+const END_TIME = "Время окончания"
+const TEXT_INPUT_MESSAGE = "Введите текст для поиска пользователей…"
+const INPUT_NOT_FOUND = "Пользователи не найдены"
+const LOADING = "Загрузка..."
+
 const style = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -205,37 +216,37 @@ export default function Room() {
       <Stack spacing={2} sx={style}>
         <TextField
           id="outlined-basic"
-          label="Имя конференции"
+          label={CONFERENCE_NAME}
           variant="outlined"
           onChange={handleConferenceNameChange}
         />
         <TextField
           id="outlined-basic"
-          label="Описание (Опционально)"
+          label={DESCRIPTION}
           variant="outlined"
           onChange={handleConferenceTopicChange}
         />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Stack spacing={2} direction="row">
             <DatePicker
-              label="Дата начала"
+              label={START_DATE}
               value={dayjs(startDate)}
               onChange={(newValue) => setStartDate(newValue?.toString() ?? "")}
             />
             <TimePicker
-              label="Время начала"
+              label={START_TIME}
               value={dayjs(startTime)}
               onChange={(newValue) => setStartTime(newValue?.toString() ?? "")}
             />
           </Stack>
           <Stack spacing={2} direction="row">
             <DatePicker
-              label="Дата окончания"
+              label={END_DATE}
               value={dayjs(endDate)}
               onChange={(newValue) => setEndDate(newValue?.toString() ?? "")}
             />
             <TimePicker
-              label="Время окончания"
+              label={END_TIME}
               value={dayjs(endTime)}
               onChange={(newValue) => setEndTime(newValue?.toString() ?? "")}
             />
@@ -257,7 +268,7 @@ export default function Room() {
           renderInput={(params) => (
             <TextField
               {...params}
-              label="Пользователи"
+              label={USERS}
               size="medium"
               InputProps={{
                 ...params.InputProps,
@@ -303,10 +314,10 @@ export default function Room() {
           }
           noOptionsText={
             term.length === 0
-              ? "Введите текст для поиска пользователей…"
-              : "Пользователи не найдены"
+              ? TEXT_INPUT_MESSAGE
+              : INPUT_NOT_FOUND
           }
-          loadingText="Загрузка..."
+          loadingText={LOADING}
         />
         <FormControl>
           <InputLabel id="widget-select-label">Виджеты</InputLabel>
