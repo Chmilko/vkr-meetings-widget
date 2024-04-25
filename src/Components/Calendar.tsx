@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { EventClickArg, CustomButtonInput } from "@fullcalendar/core/index.js";
+import { EventClickArg, CustomButtonInput, EventSourceInput } from "@fullcalendar/core/index.js";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -9,20 +9,21 @@ import Room from "./Room";
 
 const SCHEDULE_EVENT = "Запланировать событие"
 
+export type CalendarEvent = {
+  title: string
+  start: string
+  end: string
+}
+
 export default function Calendar() {
   const [open, setOpen] = useState(false);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleEventClick = (arg: EventClickArg) => {
-    console.log(arg.event.title);
-  };
 
-  // const CustomToolbar: ToolbarInput = {
-  //   center: "title",
-  //   start: "",
-  //   end: "today prev,next",
-  // };
+  };
 
   const CustomButton: CustomButtonInput = {
     text: SCHEDULE_EVENT,
@@ -42,18 +43,7 @@ export default function Calendar() {
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
         locale={ruLocale}
-        events={[
-          {
-            title: "Conference 1",
-            start: "2024-04-01T10:00:00",
-            end: "2024-04-01T11:30:00",
-          },
-          {
-            title: "Conference 2",
-            start: "2024-04-01T15:00:00",
-            end: "2024-04-01T16:00:00",
-          },
-        ]}
+        events={{ events }}
         displayEventTime={true}
         displayEventEnd={true}
         eventClick={handleEventClick}
@@ -64,7 +54,7 @@ export default function Calendar() {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Room />
+        <Room addEvents={setEvents} />
       </Modal>
     </>
   );

@@ -25,17 +25,26 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
+import { CalendarEvent } from "./Calendar";
 
-const USERS = "Пользователи"
-const CONFERENCE_NAME = "Имя конференции"
-const DESCRIPTION = "Описание (Опционально)"
-const START_DATE = "Дата начала"
-const END_DATE = "Дата окончания"
-const START_TIME = "Время начала"
-const END_TIME = "Время окончания"
-const TEXT_INPUT_MESSAGE = "Введите текст для поиска пользователей…"
-const INPUT_NOT_FOUND = "Пользователи не найдены"
-const LOADING = "Загрузка..."
+const USERS = "Пользователи";
+const CONFERENCE_NAME = "Имя конференции";
+const DESCRIPTION = "Описание (Опционально)";
+const START_DATE = "Дата начала";
+const END_DATE = "Дата окончания";
+const START_TIME = "Время начала";
+const END_TIME = "Время окончания";
+const TEXT_INPUT_MESSAGE = "Введите текст для поиска пользователей…";
+const INPUT_NOT_FOUND = "Пользователи не найдены";
+const LOADING = "Загрузка...";
+const WIDGETS_BUTTON = "Виджеты";
+const CREATE_ROOM_BUTTON = "Создать комнату";
+
+const widgetURLs = [
+  "https://spanner.half-shot.uk/?spannerName=YourSpannerName&spannerId=SomeUniqueId&sendSpannerMsg=true|false",
+];
+
+const widgets = ["spanner"];
 
 const style = {
   position: "absolute" as "absolute",
@@ -48,7 +57,11 @@ const style = {
   p: 4,
 };
 
-export default function Room() {
+type RoomProps = {
+  addEvents: React.Dispatch<React.SetStateAction<CalendarEvent[]>>
+}
+
+export default function Room({addEvents}: RoomProps) {
   const [name, setName] = useState<string>("");
   const [selected, setSelected] = useState<SearchResults>([]);
   const [topic, setTopic] = useState<string>("");
@@ -61,22 +74,16 @@ export default function Room() {
 
   const widgetApi = useWidgetApi();
 
-  const widgetURLs = [
-    "https://spanner.half-shot.uk/?spannerName=YourSpannerName&spannerId=SomeUniqueId&sendSpannerMsg=true|false",
-  ];
-
-  const widgets = ["spanner"];
-
   const { loading, results, error } = useUserSearchResults(term, 100);
 
-  const handleConferenceNameChange = (e: ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    setName(e.target.value);
+  const handleConferenceNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    setName(event.target.value);
   };
 
-  const handleConferenceTopicChange = (e: ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    setTopic(e.target.value);
+  const handleConferenceTopicChange = (event: ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    setTopic(event.target.value);
   };
 
   const handleWidgetsChange = (event: SelectChangeEvent<typeof widgetName>) => {
@@ -96,7 +103,6 @@ export default function Room() {
 
   function createNewRoom(event: any) {
     event.preventDefault();
-    console.log(client.getAccessToken());
 
     const roomId = client.createRoom({
       room_alias_name: uuid,
@@ -113,41 +119,17 @@ export default function Room() {
     });
 
     roomId.then((res) => {
+      const newEvent: CalendarEvent = {
+        title: name,
+        start: dayjs(startDate).format('YYYY-MM-DD').toString() + 'T' + dayjs(startTime).format('HH:mm:ss').toString(),
+        end: dayjs(endDate).format('YYYY-MM-DD').toString() + 'T' + dayjs(endTime).format('HH:mm:ss').toString()
+      };
+
+      addEvents(prevState => [...prevState, newEvent]);
+
       addWidgets(res.room_id);
     });
   }
-
-  useEffect(() => {
-    console.log(dayjs(endTime).format('HH:mm:ss').toString())
-  }, [endTime]);
-
-  /*room_alias_name?: string;
-    // Either 'public' or 'private'.
-    visibility?: Visibility;
-    // The name to give this room.
-    name?: string;
-    // The topic to give this room.
-    topic?: string;
-    preset?: Preset;
-    power_level_content_override?: {
-        ban?: number;
-        events?: Record<EventType | string, number>;
-        events_default?: number;
-        invite?: number;
-        kick?: number;
-        notifications?: Record<string, number>;
-        redact?: number;
-        state_default?: number;
-        users?: Record<string, number>;
-        users_default?: number;
-    };
-    creation_content?: object;
-    initial_state?: ICreateRoomStateEvent[];
-    // A list of user IDs to invite to this room.
-    invite?: string[];
-    invite_3pid?: IInvite3PID[];
-    is_direct?: boolean;
-    room_version?: string; */
 
   type SearchResults = Array<{
     userId: string;
@@ -255,7 +237,6 @@ export default function Room() {
         <Autocomplete
           sx={{ flex: 1 }}
           getOptionLabel={(user) => user.userId}
-          // disable built-in filtering
           filterOptions={(x) => x}
           options={results}
           includeInputInList
@@ -313,14 +294,12 @@ export default function Room() {
             ))
           }
           noOptionsText={
-            term.length === 0
-              ? TEXT_INPUT_MESSAGE
-              : INPUT_NOT_FOUND
+            term.length === 0 ? TEXT_INPUT_MESSAGE : INPUT_NOT_FOUND
           }
           loadingText={LOADING}
         />
         <FormControl>
-          <InputLabel id="widget-select-label">Виджеты</InputLabel>
+          <InputLabel id="widget-select-label">{WIDGETS_BUTTON}</InputLabel>
           <Select
             labelId="widget-select-label"
             id="widget-select"
@@ -345,7 +324,7 @@ export default function Room() {
         </FormControl>
         <form onSubmit={createNewRoom}>
           <button className="mt-2 bg-black text-white p-2 border border-black hover:bg-white hover:text-black">
-            Create Room
+            {CREATE_ROOM_BUTTON}
           </button>
         </form>
       </Stack>
